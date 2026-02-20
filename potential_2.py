@@ -248,23 +248,22 @@ def load_registry(filepath: str | Path = "potentials.pkl", npz_dir: Optional[str
         registry = joblib.load(str(path))
         print(f"Registry loaded from {filepath}")
 
-        # interp を再構築（scipy バージョン差吸収）
+        # --- 安全に補間器を再構築 ---
         for pot in registry._pairs.values():
-            axes = pot.axes
-            # scipy<=1.10系と>=1.11系の両対応
-            values = getattr(pot.interp, "values", None)
-            if values is None:
-                values = getattr(pot.interp, "_values", None)
-            if values is None:
-                # 万一取り出せなければ、PairPotential が持つ元配列にフォールバック
-                # （保存時に参照を残していない場合は例外にする）
-                raise RuntimeError("Failed to extract interpolator values for rebuild.")
+            if not hasattr(pot, "energies"):
+                raise RuntimeError(
+                    "This pickle was created with an old PairPotential "
+                    "that does not store 'energies'. "
+                    "Please re-save the registry with the updated potential_2.py."
+                )
+
             pot.interp = RegularGridInterpolator(
-                axes,
-                values,
+                pot.axes,
+                pot.energies,
                 bounds_error=False,
                 fill_value=None
             )
+
         print("[patch] Rebuilt interpolators after pkl load")
         return registry
 
