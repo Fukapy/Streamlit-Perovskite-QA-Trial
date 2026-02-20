@@ -96,9 +96,12 @@ class PairPotential:
             self.dim = 3
             self.axes = (np.asarray(r_points), np.asarray(theta_points), np.asarray(phi_points))
 
+        # ★ energies を明示的に保存
+        self.energies = np.asarray(energies)
+
         self.interp = RegularGridInterpolator(
             self.axes,
-            np.asarray(energies),
+            self.energies,
             bounds_error=False,
             fill_value=None if extrapolation else np.nan,
         )
