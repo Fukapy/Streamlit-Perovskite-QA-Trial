@@ -144,7 +144,7 @@ class PairPotential:
         return f"PairPotential({self.e1}-{self.e2}, dim={self.dim})"
 
 # =============================
-# 3. レジストリ　2026/2/2
+# 3. レジストリ　2026/2/24 edited on GitHub
 # =============================
 import math
 
@@ -217,6 +217,43 @@ class PotentialRegistry:
 
     def get_energy(self, e1: str, e2: str, *args) -> float:
         return self.energy(e1, e2, *args)
+
+    # 2026/2/24 on github
+    def register_npz(self, e1: str, e2: str, npz_path: str | Path):
+        npz_path = Path(npz_path)
+        data = np.load(npz_path)
+
+        # npzに入っている想定キーに合わせる
+        # もしキー名が違うなら、ここだけ調整すればOK
+        r_points = data["r_points"]
+        energies = data["energies"]
+
+        theta_points = data["theta_points"] if "theta_points" in data.files else None
+        phi_points   = data["phi_points"]   if "phi_points"   in data.files else None
+
+        # species_info が空なら簡易ルールで生成
+        if not self.species_info:
+            axial = {"MA", "FA", "EA"}
+            def shape(x): return "axial" if x in axial else "spherical"
+            self.species_info = {e1: SpeciesInfo(shape(e1)), e2: SpeciesInfo(shape(e2))}
+
+        # 未登録種があれば追加
+        if e1 not in self.species_info:
+            self.species_info[e1] = SpeciesInfo("spherical")
+        if e2 not in self.species_info:
+            self.species_info[e2] = SpeciesInfo("spherical")
+
+        pot = PairPotential(
+            e1=e1,
+            e2=e2,
+            species_info=self.species_info,
+            r_points=r_points,
+            energies=energies,
+            theta_points=theta_points,
+            phi_points=phi_points,
+        )
+
+        self._pairs[self._pair_key(e1, e2)] = pot
         
 
 # =============================
