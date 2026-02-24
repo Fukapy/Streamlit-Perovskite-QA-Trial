@@ -9,7 +9,7 @@ from lattice_provider import lattice_from_user_or_default, lattice_predict_simpl
 
 # added 2026/2/24 on GitHub
 from pathlib import Path
-from potentials_2 import load_registry
+from potential_2 import load_registry
 BASE = Path(__file__).resolve().parent
 pkl_path = BASE / "pair_potentials_MACE_ABX_all" / "potentials_20251116.pkl"
 npz_dir  = BASE / "pair_potentials_MACE_ABX_all"
