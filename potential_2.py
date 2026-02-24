@@ -281,27 +281,27 @@ def load_registry(filepath: str | Path = "potentials.pkl", npz_dir: Optional[str
         print(f"Registry loaded from {filepath}")
 
         # --- 安全に補間器を再構築 ---
-    for pot in registry._pairs.values():
-        # 古いpickleは energies を持たないが interp.values に残っている
-        if not hasattr(pot, "energies"):
-            if hasattr(pot, "interp") and hasattr(pot.interp, "values"):
-                pot.energies = np.asarray(pot.interp.values)
-            else:
-                raise RuntimeError(
-                    "This pickle was created with an old PairPotential "
-                    "that does not store 'energies' and cannot be upgraded."
-                )
-    
-        # axes が無いケースにも一応備える
-        if not hasattr(pot, "axes"):
-            raise RuntimeError("Old pickle is missing axes, cannot rebuild interpolator.")
-    
-        pot.interp = RegularGridInterpolator(
-            pot.axes,
-            pot.energies,
-            bounds_error=False,
-            fill_value=None
-        )
+        for pot in registry._pairs.values():
+            # 古いpickleは energies を持たないが interp.values に残っている
+            if not hasattr(pot, "energies"):
+                if hasattr(pot, "interp") and hasattr(pot.interp, "values"):
+                    pot.energies = np.asarray(pot.interp.values)
+                else:
+                    raise RuntimeError(
+                        "This pickle was created with an old PairPotential "
+                        "that does not store 'energies' and cannot be upgraded."
+                    )
+        
+            # axes が無いケースにも一応備える
+            if not hasattr(pot, "axes"):
+                raise RuntimeError("Old pickle is missing axes, cannot rebuild interpolator.")
+        
+            pot.interp = RegularGridInterpolator(
+                pot.axes,
+                pot.energies,
+                bounds_error=False,
+                fill_value=None
+            )
 
     except Exception as e:
         msg = f"[WARN] Failed to load usable pkl ({e})."
