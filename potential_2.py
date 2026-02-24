@@ -222,27 +222,23 @@ class PotentialRegistry:
     def register_npz(self, e1: str, e2: str, npz_path: str | Path):
         npz_path = Path(npz_path)
         data = np.load(npz_path)
-
-        # npzに入っている想定キーに合わせる
-        # もしキー名が違うなら、ここだけ調整すればOK
-        r_points = data["r_points"]
+    
+        r_points = data["r"]
         energies = data["energies"]
-
-        theta_points = data["theta_points"] if "theta_points" in data.files else None
-        phi_points   = data["phi_points"]   if "phi_points"   in data.files else None
-
-        # species_info が空なら簡易ルールで生成
+    
+        theta_points = data["theta"] if "theta" in data.files else None
+        phi_points   = data["phi"]   if "phi"   in data.files else None
+    
         if not self.species_info:
             axial = {"MA", "FA", "EA"}
             def shape(x): return "axial" if x in axial else "spherical"
             self.species_info = {e1: SpeciesInfo(shape(e1)), e2: SpeciesInfo(shape(e2))}
-
-        # 未登録種があれば追加
+    
         if e1 not in self.species_info:
             self.species_info[e1] = SpeciesInfo("spherical")
         if e2 not in self.species_info:
             self.species_info[e2] = SpeciesInfo("spherical")
-
+    
         pot = PairPotential(
             e1=e1,
             e2=e2,
@@ -252,10 +248,9 @@ class PotentialRegistry:
             theta_points=theta_points,
             phi_points=phi_points,
         )
-
+    
         self._pairs[self._pair_key(e1, e2)] = pot
         
-
 # =============================
 # 4. 保存・ロードユーティリティ
 # =============================
