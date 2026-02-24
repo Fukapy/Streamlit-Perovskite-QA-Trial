@@ -127,11 +127,22 @@ class PairPotential:
     def _eval_rgi(self, *coords: float) -> float:
         pt = np.array(coords, dtype=float, ndmin=1).reshape(1, -1)
         val = self.interp(pt)
-        # 通常はスカラー配列になる
+    
+        # scipy の挙動差で val がスカラーになる場合があるため両対応
+        if np.ndim(val) == 0:
+            return float(val)
+    
         v0 = val[0]
-        if np.ndim(v0) != 0:
-            raise TypeError(f"{self.e1}-{self.e2}: interpolator returned non-scalar {type(v0)} with shape {np.shape(v0)}")
-        return float(v0)
+    
+        # v0 がスカラーならOK
+        if np.ndim(v0) == 0:
+            return float(v0)
+    
+        # ここに来るのは energies 次元と dim 判定がズレているとき
+        raise TypeError(
+            f"{self.e1}-{self.e2}: interpolator returned non-scalar. "
+            f"type={type(v0)}, shape={np.shape(v0)}"
+        )
 
     def energy(self, r: float, theta: Optional[float] = None, phi: Optional[float] = None) -> float:
         if self.dim == 1:
