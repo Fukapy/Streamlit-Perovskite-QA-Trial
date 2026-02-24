@@ -2,3 +2,4 @@
 amplify==1.4.0
 scipy==1.10.1
 joblib==1.5.2
+numpy==1.23.5
