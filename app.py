@@ -1,10 +1,19 @@
 # app.py 2026/2/3
+# edited 2026/2/24 on GitHub
 
 import os
 import streamlit as st
 from potential_2 import load_registry
 from mace_qubo_core import run_full_workflow
 from lattice_provider import lattice_from_user_or_default, lattice_predict_simple_from_csv
+
+# added 2026/2/24 on GitHub
+from pathlib import Path
+from potentials_2 import load_registry
+BASE = Path(__file__).resolve().parent
+pkl_path = BASE / "pair_potentials_MACE_ABX_all" / "potentials_20251116.pkl"
+npz_dir  = BASE / "pair_potentials_MACE_ABX_all"
+registry = load_registry(pkl_path, npz_dir=str(npz_dir))
 
 
 # =========================
