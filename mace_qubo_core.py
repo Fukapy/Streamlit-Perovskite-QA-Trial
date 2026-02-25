@@ -1,4 +1,5 @@
 # 20260203
+# 20260225 editted
 
 ### 0．分子スケーリング
 
@@ -874,8 +875,10 @@ def build_ABX3_coords_with_full_MA_FA(
     B_sites_frac = coords["B"]
     X_sites_frac = coords["X"]
 
+    # 20260225 MA and FA added
     species_coords = {
         "Cs": [],
+        "MA": [], "FA": [],
         "Ge": [], "Sn": [], "Pb": [],
         "Cl": [], "Br": [], "I": [],
         "C": [], "N": [], "H": [],
@@ -887,7 +890,10 @@ def build_ABX3_coords_with_full_MA_FA(
     for fA, spA in zip(A_sites_frac, chosen_A):
         if spA == "Cs":
             species_coords["Cs"].append(frac_to_cart(fA))
-        elif spA == "MA":
+        elif spA == "MA": # 20260225 edit
+            # まず擬似粒子として Aサイト座標を保存
+            species_coords["MA"].append(frac_to_cart(fA))
+        
             idx = chosen_orient.get(np.where(np.all(A_sites_frac == fA, axis=1))[0][0], None)
             if idx is None:
                 continue
@@ -901,6 +907,8 @@ def build_ABX3_coords_with_full_MA_FA(
                 elif key.startswith("H"):
                     species_coords["H"].append(pos)
         elif spA == "FA":
+            species_coords["FA"].append(frac_to_cart(fA))
+        
             idx = chosen_orient.get(np.where(np.all(A_sites_frac == fA, axis=1))[0][0], None)
             if idx is None:
                 continue
@@ -913,7 +921,7 @@ def build_ABX3_coords_with_full_MA_FA(
                     species_coords["N"].append(pos)
                 elif key.startswith("H"):
                     species_coords["H"].append(pos)
-
+                    
     for fB, spB in zip(B_sites_frac, chosen_B):
         species_coords[spB].append(frac_to_cart(fB))
 
@@ -1168,7 +1176,7 @@ def run_full_workflow(
         )
     else:
         species_coords = {
-            "Cs": [],
+            "Cs": [], "MA": [], "FA": [],
             "Ge": [], "Sn": [], "Pb": [],
             "Cl": [], "Br": [], "I": [],
             "C": [], "N": [], "H": [],
@@ -1177,8 +1185,8 @@ def run_full_workflow(
         B_frac = coords["B"]
         X_frac = coords["X"]
         for f, sp in zip(A_frac, chosen_A):
-            if sp == "Cs":
-                species_coords["Cs"].append(f)
+            if sp in ("Cs", "MA", "FA"):
+                species_coords[sp].append(f)
         for f, sp in zip(B_frac, chosen_B):
             species_coords[sp].append(f)
         for f, sp in zip(X_frac, chosen_X):
