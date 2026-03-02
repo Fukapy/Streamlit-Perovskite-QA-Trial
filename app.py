@@ -23,9 +23,6 @@ registry = load_registry(pkl_path, npz_dir=str(npz_dir))
 CHARGE_TABLE_DEFAULT = {
     # Aサイト
     "Cs": +1.0,
-    "Rb": +1.0,
-    "K": +1.0,
-    "Na": +1.0,
     "MA": +1.0,
     "FA": +1.0,
 
@@ -178,7 +175,7 @@ def has_organic_on_A(A: dict) -> bool:
 # =========================
 
 st.set_page_config(page_title="Perovskite ABX3 構造探索", layout="wide")
-st.title("ペロブスカイト ABX3 構造探索 Web ツール")
+st.title("【試作版】ペロブスカイト ABX3 構造探索 Web ツール")
 
 st.sidebar.header("量子アニーリング API")
 
